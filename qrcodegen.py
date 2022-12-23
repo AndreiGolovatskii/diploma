@@ -84,7 +84,7 @@ class QRCodeMarkup:
         centroids = np.logical_and(rows, columns)
 
         filename = f"{dataset_dir}/{str(uuid.uuid4())}"
-        qr_code.png(f"{filename}.qr.png",scale=self.qr_code_scale,quiet_zone=self.quiet_zone)
+        qr_code.png(f"{filename}.qr.png",scale=self.qr_code_scale,quiet_zone=self.quiet_zone) # RGB image
 
         for markup, name in [(rows, "rows"), (columns, "columns"), (centroids, "centroids")]:
-            cv2.imwrite(f"{filename}.{name}.png", np.uint8(markup)*255)
+            cv2.imwrite(f"{filename}.{name}.png", np.uint8(markup)*255) # grayscale image

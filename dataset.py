@@ -30,15 +30,15 @@ class QrDataset(Dataset):
         uid = self.img_uids[idx]
 
         qr_path = os.path.join(self.img_dir, f"{uid}.{self.QR_CODE_SUFF}.png")
-        qr = cv2.imread(qr_path)
+        qr = cv2.imread(qr_path, cv2.IMREAD_COLOR)
 
         markups = {}
         for suff in self.MARKUP_SUFFS:
             markup_path = os.path.join(self.img_dir, f"{uid}.{suff}.png")
-            markup = np.array(cv2.imread(markup_path))
+            markup = np.array(cv2.imread(markup_path, cv2.IMREAD_GRAYSCALE))
             markups[suff] = markup
 
-        if self.transform:
+        if self.transform is not None:
             masks = [markups[key] for key in self.MARKUP_SUFFS]
             transformed = self.transform(image=qr, masks=masks)
             qr = transformed['image']
