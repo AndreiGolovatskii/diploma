@@ -1,4 +1,5 @@
 import random
+import os
 
 import pyqrcodeng as pyqrcode #!not a pyqrcode
 import numpy as np
@@ -88,3 +89,41 @@ class QRCodeMarkup:
 
         for markup, name in [(rows, "rows"), (columns, "columns"), (centroids, "centroids")]:
             cv2.imwrite(f"{filename}.{name}.png", np.uint8(markup)*255) # grayscale image
+
+
+class DatasetGen:
+    def __init__(self, path):
+        if not os.path.exists(path):
+            os.mkdir(path)
+        assert os.path.isdir(path)
+
+        self.path = path
+        self.set_markup_parameters()
+        self.set_qr_code_parameters()
+
+    def set_markup_parameters(self, quiet_zone = None, markup_scale = None, qr_code_scale = None):
+        self.quiet_zone = quiet_zone or QRCodeMarkup.DEFAULT_QUIET_ZONE
+        self.markup_scale = markup_scale or QRCodeMarkup.DEFAULT_MARKUP_SCALE
+        self.qr_code_scale = qr_code_scale or QRCodeMarkup.DEFAULT_QR_CODE_SCALE
+        return self
+
+    def set_qr_code_parameters(self, error_levels = None, versions = None, modes = None):
+        self.error_levels = error_levels or QRCodeGen.DEFAULT_ERROR_LEVELS
+        self.versions = versions or QRCodeGen.DEFAULT_VERSIONS
+        self.modes = modes or QRCodeGen.DEFAULT_MODES
+        return self
+
+    def generate(self, size, clear_old = True):
+        assert os.path.isdir(self.path)
+        if clear_old:
+            for f in os.listdir(self.path):
+                os.remove(os.path.join(self.path, f))
+
+        generator = QRCodeGen(versions=self.versions, error_levels=self.error_levels, modes=self.modes)
+        markup = QRCodeMarkup(markup_scale=self.markup_scale, qr_code_scale=self.qr_code_scale, quiet_zone=self.quiet_zone)
+
+        for _ in range(size):
+            code = generator()
+            markup.save(code, self.path)
+        pass
+
