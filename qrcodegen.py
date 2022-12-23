@@ -2,8 +2,8 @@ import random
 
 import pyqrcodeng as pyqrcode #!not a pyqrcode
 import numpy as np
-from PIL import Image
 import uuid
+import cv2
 
 class QRCodeGen:
     DEFAULT_ERROR_LEVELS = ['L', 'M', 'Q', 'H']
@@ -87,4 +87,4 @@ class QRCodeMarkup:
         qr_code.png(f"{filename}.qr.png",scale=self.qr_code_scale,quiet_zone=self.quiet_zone)
 
         for markup, name in [(rows, "rows"), (columns, "columns"), (centroids, "centroids")]:
-            Image.fromarray(np.uint8(markup)*255).save(f"{filename}.{name}.png")
+            cv2.imwrite(f"{filename}.{name}.png", np.uint8(markup)*255)

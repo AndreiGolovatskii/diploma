@@ -1,8 +1,8 @@
 import os
 
 from torch.utils.data import Dataset
-from PIL import Image
 import numpy as np
+import cv2
 
 class QrDataset(Dataset):
     QR_CODE_SUFF = 'qr'
@@ -30,12 +30,12 @@ class QrDataset(Dataset):
         uid = self.img_uids[idx]
 
         qr_path = os.path.join(self.img_dir, f"{uid}.{self.QR_CODE_SUFF}.png")
-        qr = np.array(Image.open(qr_path).convert('RGB'))
+        qr = cv2.imread(qr_path)
 
         markups = {}
         for suff in self.MARKUP_SUFFS:
             markup_path = os.path.join(self.img_dir, f"{uid}.{suff}.png")
-            markup = np.array(Image.open(markup_path))
+            markup = np.array(cv2.imread(markup_path))
             markups[suff] = markup
 
         if self.transform:
