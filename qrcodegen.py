@@ -87,4 +87,4 @@ class QRCodeMarkup:
         qr_code.png(f"{filename}.qr.png",scale=self.qr_code_scale,quiet_zone=self.quiet_zone)
 
         for markup, name in [(rows, "rows"), (columns, "columns"), (centroids, "centroids")]:
-            Image.fromarray(np.bitwise_not(np.uint8(markup)*255)).save(f"{filename}.{name}.png")
+            Image.fromarray(np.uint8(markup)*255).save(f"{filename}.{name}.png")
