@@ -9,11 +9,10 @@ class QrDataset(Dataset):
     MARKUP_SUFFS = ['rows', 'columns', 'centroids']
     DATA_SUFFS = [QR_CODE_SUFF] + MARKUP_SUFFS
 
-    def __init__(self, data_dir, transform=None, target_transform=None):
+    def __init__(self, data_dir, transform=None):
         self.img_dir = data_dir
         self.img_uids = list()
         self.transform = transform
-        self.target_transform = target_transform
 
         files = set(filename for filename in os.listdir(data_dir) if os.path.isfile(os.path.join(data_dir, filename)))
         for filename in files:
@@ -33,14 +32,16 @@ class QrDataset(Dataset):
         qr_path = os.path.join(self.img_dir, f"{uid}.{self.QR_CODE_SUFF}.png")
         qr = np.array(Image.open(qr_path).convert('RGB'))
 
-        if self.transform:
-            qr = self.transform(qr)
-
         markups = {}
         for suff in self.MARKUP_SUFFS:
             markup_path = os.path.join(self.img_dir, f"{uid}.{suff}.png")
             markup = np.array(Image.open(markup_path))
-            if self.target_transform:
-                markup = self.target_transform(markup)
             markups[suff] = markup
+
+        if self.transform:
+            masks = [markups[key] for key in self.MARKUP_SUFFS]
+            transformed = self.transform(image=qr, masks=masks)
+            qr = transformed['image']
+            markups = {key:transformed['masks'][i] for i, key in enumerate(self.MARKUP_SUFFS)}
+
         return qr, markups
